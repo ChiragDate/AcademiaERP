@@ -29,6 +29,9 @@ public class Employee {
     @Column(name = "department", nullable = false)
     private String department;
 
+    @Column(name = "password", nullable = false)
+    private String password;
+    
     @Column(name = "title")
     private String title;
 
