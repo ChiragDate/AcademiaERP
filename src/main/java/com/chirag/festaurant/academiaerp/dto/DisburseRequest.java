@@ -14,12 +14,10 @@ public class DisburseRequest {
         @NotNull(message = "Employee salary mapping cannot be null")
         @NotEmpty(message = "Employee salary mapping cannot be empty")
         @JsonProperty("employeeSalaryMap")
-        private Map<Long, Long> employeeSalaryMap; // Map of employeeId -> salaryAmount
+        private Map<Long, Long> employeeSalaryMap; // Map of employee_id -> salaryAmount
 
         @JsonProperty("description")
         private String description; // Optional field for additional remarks or comments
 
-        @NotNull(message = "Logged-in employee ID must be provided")
-        @JsonProperty("loggedInEmployeeId")
-        private Long loggedInEmployeeId; // The ID of the logged-in employee performing the disbursement
+        private String token;
 }

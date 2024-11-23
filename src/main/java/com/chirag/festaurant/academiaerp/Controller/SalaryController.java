@@ -1,25 +1,34 @@
 package com.chirag.festaurant.academiaerp.Controller;
 
+import com.chirag.festaurant.academiaerp.Service.SalaryService;
 import com.chirag.festaurant.academiaerp.dto.DisburseRequest;
+import com.chirag.festaurant.academiaerp.dto.EmployeeDTO;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.Map;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/salary")
+@RequiredArgsConstructor
 public class SalaryController {
 
+    private final SalaryService salaryService;
     @PostMapping("/disburse")
-    public String disburseSalaries(@RequestBody DisburseRequest request) {
-        Map<Long, Long> employeeSalaryMap = request.getEmployeeSalaryMap();
-        Long loggedInEmployeeId = request.getLoggedInEmployeeId();
+    public ResponseEntity<String> disburseSalaries(@RequestBody DisburseRequest request) {
 
-        if (employeeSalaryMap.containsKey(loggedInEmployeeId)) {
-            throw new IllegalArgumentException("Logged-in employee cannot disburse salary to themselves.");
-        }
+        salaryService.disburseSalary(request);
+        return ResponseEntity.ok("Salaries disbursed successfully.");
 
-        // Perform salary disbursement logic here
-        // Save transaction in database, etc.
-
-        return "Salaries disbursed successfully.";
     }
+
+    @GetMapping("/employees")
+    public ResponseEntity<List<EmployeeDTO>> getEmployeeDetailsWithLastSalary() {
+        System.out.println("GET employees details called");
+        // Call service to fetch employee details and their last disbursed salary
+        return ResponseEntity.ok(salaryService.getEmployeesWithLastSalary());
+    }
+
+
 }

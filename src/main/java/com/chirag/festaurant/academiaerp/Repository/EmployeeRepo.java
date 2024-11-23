@@ -1,12 +1,19 @@
 package com.chirag.festaurant.academiaerp.Repository;
 
-import com.chirag.festaurant.academiaerp.Entity.Employee;
+import com.chirag.festaurant.academiaerp.Entity.Employees;
+import com.chirag.festaurant.academiaerp.dto.EmployeeDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface EmployeeRepo extends JpaRepository<Employee,Long> {
+@Repository
+public interface EmployeeRepo extends JpaRepository<Employees,Long> {
 
-    Optional<Employee> findEmployeeByEmail(String email);
+    @Query("SELECT e FROM Employees e WHERE e.email = :email")
+    Optional<Employees> findEmployeeByEmail(@Param("email") String email);
+
 }

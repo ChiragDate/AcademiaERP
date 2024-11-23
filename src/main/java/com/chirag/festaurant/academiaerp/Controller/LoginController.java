@@ -13,13 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 public class LoginController {
 
     private final SalaryService service;
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody @Valid LoginRequest loginrequest) {
-        return ResponseEntity.ok(service.loginApi(loginrequest));
+        String var = service.loginApi(loginrequest);
+        System.out.println(var);
+        return ResponseEntity.ok(var);
     }
 }
