@@ -7,11 +7,11 @@
 
 -- Dummy Data for Employees Table
 INSERT INTO employees (employee_Id, first_name, last_name, email, password, department, title, photographPath) VALUES
-(1, 'John', 'Doe', 'john.doe@example.com', 'password123', 1, 'Software Engineer', '/photos/john_doe.jpg'),
-(2, 'Jane', 'Smith', 'jane.smith@example.com', 'password456', 2, 'Hardware Engineer', '/photos/jane_smith.jpg'),
-(3, 'Alice', 'Johnson', 'alice.johnson@example.com', 'password789', 3, 'Data Scientist', '/photos/alice_johnson.jpg'),
+(1, 'John', 'Doe', 'john.doe@example.com', 'password123', 'Admin', 'Admin', '/photos/john_doe.jpg'),
+(2, 'Jane', 'Smith', 'jane.smith@example.com', 'password456', 'Information Technology', 'Hardware Engineer', '/photos/jane_smith.jpg'),
+(3, 'Alice', 'Johnson', 'alice.johnson@example.com', 'password789', 3, 'Assistant Professor', '/photos/alice_johnson.jpg'),
 (4, 'Bob', 'Williams', 'bob.williams@example.com', 'password101', 4, 'AI Researcher', '/photos/bob_williams.jpg'),
-(5, 'Charlie', 'Brown', 'charlie.brown@example.com', 'password202', 1, 'Backend Developer', '/photos/charlie_brown.jpg');
+(5, 'Charlie', 'Brown', 'charlie.brown@example.com', 'password202', 'Computer Science', 'Backend Developer', '/photos/charlie_brown.jpg');
 
 -- Mapping Departments to IDs:
 -- 1 = CSE

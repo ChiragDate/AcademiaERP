@@ -23,22 +23,25 @@ public class EmployeeDTO {
     @JsonProperty("title")
     private String title;
 
-    @JsonProperty("amount")
+    @JsonProperty("salary")
     private Long amount;
+
+    @JsonProperty("description")
+    private String description;
 
     // Constructor
     public EmployeeDTO(Long employee_id, String first_name, String last_name, String email,
-                       String department, String title, Long amount) {
+                       String department, String title,String description,Long salary) {
         this.employee_id = employee_id;
         this.first_name = first_name;
         this.last_name = last_name;
         this.email = email;
         this.department = department;
         this.title = title;
-        this.amount = amount;
+        this.description = description;
+        this.amount = salary;
     }
 
     // Add default constructor
-    public EmployeeDTO() {
-    }
+
 }

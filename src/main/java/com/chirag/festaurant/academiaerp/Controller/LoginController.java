@@ -6,10 +6,7 @@ import com.chirag.festaurant.academiaerp.dto.LoginRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,10 +15,17 @@ public class LoginController {
 
     private final SalaryService service;
 
+    @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "Authorization")
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody @Valid LoginRequest loginrequest) {
-        String var = service.loginApi(loginrequest);
-        System.out.println(var);
-        return ResponseEntity.ok(var);
+    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
+        String token = service.loginApi(request);
+        System.out.println(token);
+        return ResponseEntity.ok()
+                .body(token);
+
+//        return ResponseEntity.ok()
+//                .header("Authorization", "Bearer " + token)
+//                .body("Login successful");
+
     }
 }

@@ -3,19 +3,18 @@ package com.chirag.festaurant.academiaerp.Service;
 import com.chirag.festaurant.academiaerp.Entity.Employees;
 import com.chirag.festaurant.academiaerp.Entity.EmployeesSalary;
 import com.chirag.festaurant.academiaerp.Exception.EmployeeNotFoundException;
+import com.chirag.festaurant.academiaerp.Exception.MissingTokenException;
 import com.chirag.festaurant.academiaerp.Helper.EncryptionService;
 import com.chirag.festaurant.academiaerp.Helper.JWTHelper;
 import com.chirag.festaurant.academiaerp.Repository.EmployeeRepo;
 import com.chirag.festaurant.academiaerp.Repository.EmployeeSalaryRepo;
-import com.chirag.festaurant.academiaerp.dto.DisburseRequest;
 import com.chirag.festaurant.academiaerp.dto.EmployeeDTO;
 import com.chirag.festaurant.academiaerp.dto.LoginRequest;
+import com.chirag.festaurant.academiaerp.mapper.EmployeeSalaryMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -27,47 +26,8 @@ public class SalaryService {
     private final EmployeeSalaryRepo salaryRepo;
     private final EncryptionService encryptionService;
     private final JWTHelper jwtHelper;
+    private final AuthenticationService authService;
 
-    public void disburseSalary(DisburseRequest request) {
-        Map<Long, Long> employeeSalaryMap = request.getEmployeeSalaryMap();
-        String description = request.getDescription();
-        String email = jwtHelper.extractEmail(request.getToken());
-
-        Long loggedInEmployeeId = getEmployee(email).getEmployee_Id();
-
-        if (employeeSalaryMap.containsKey(loggedInEmployeeId)) {
-            throw new IllegalArgumentException("Logged-in employee cannot disburse salary to themselves.");
-        }
-
-        // Validate employee existence and remove logged-in employee
-        Set<Long> validEmployeeIds = employeeSalaryMap.keySet().stream()
-                .filter(id -> !id.equals(loggedInEmployeeId) && employeeRepo.existsById(id))
-                .collect(Collectors.toSet());
-        if (employeeSalaryMap.containsKey(loggedInEmployeeId)) {
-            throw new IllegalArgumentException("Logged-in employee cannot disburse salary to themselves.");
-        }
-
-        if (validEmployeeIds.isEmpty()) {
-            throw new RuntimeException("No valid employees to disburse salary to.");
-        }
-
-        // Process salary disbursement
-        validEmployeeIds.forEach(employeeId -> {
-            EmployeesSalary salary = new EmployeesSalary();
-            salary.setEmployee_Id(employeeId);
-            salary.setAmount(employeeSalaryMap.get(employeeId)); // Individual salary amount
-            salary.setPaymentDate(LocalDate.now());
-            salary.setDescription(description);
-            salaryRepo.save(salary);
-        });
-    }
-
-    public Employees getEmployee(String email) {
-        return employeeRepo.findEmployeeByEmail(email)
-                .orElseThrow(() -> new EmployeeNotFoundException(
-                        format("Cannot find Employee:: No employee found with the provided email:: %s", email)
-                ));
-    }
 
     public String loginApi(LoginRequest request) {
         Employees employee = getEmployee(request.email());
@@ -78,15 +38,50 @@ public class SalaryService {
         return jwtHelper.generateToken(request.email());
     }
 
-    public List<EmployeeDTO> getEmployeesWithLastSalary() {
+    public void disburseSalary(List<EmployeeDTO> request) {
+        List<EmployeesSalary> salaryEntities = request.stream()
+                .map(EmployeeSalaryMapper :: toEntity) // Use the mapper's toEntity method
+                .toList();
+        System.out.println("Service reached");
+        System.out.println("List: "+ salaryEntities);
+
+        salaryRepo.saveAll(salaryEntities);
+    }
+
+    public Employees getEmployee(String email) {
+        return employeeRepo.findEmployeeByEmail(email)
+                .orElseThrow(() -> new EmployeeNotFoundException(
+                        format("Cannot find Employee:: No employee found with the provided email:: %s", email)
+                ));
+    }
+
+
+    public List<EmployeeDTO> getEmployeesWithLastSalary(String authHeader) {
         try {
+
+            String token = "";
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                // Extract the token
+                 token = authHeader.substring(7); // Remove "Bearer " prefix
+
+                // Now you can use this token, e.g., for validation or processing
+                // You can validate or decode the token her
+            } else {
+                // Handle cases where the Authorization header is missing or incorrect
+                throw new MissingTokenException("Authorization header is missing or invalid.");
+            }
+            String curr = jwtHelper.extractEmail(token);
+            Long id2 = getEmployee(curr).getEmployee_Id();
+            //Long currentUserId = authService.getCurrentEmployeeId();
+            System.out.println(id2);
             // Directly fetch the DTO objects using the repository method
-            List<EmployeeDTO> employeeDTOs = salaryRepo.findEmployeesWithLastDisbursedSalary();
+            List<EmployeeDTO> employeeDTOs = salaryRepo.findEmployeesWithLastDisbursedSalary(id2);
 
             if (employeeDTOs.isEmpty()) {
                 throw new RuntimeException("No employee salary data found");
             }
-
+            System.out.println("Called Salary Service get employees");
+            System.out.println(employeeDTOs);
             return employeeDTOs;
 
         } catch (Exception e) {

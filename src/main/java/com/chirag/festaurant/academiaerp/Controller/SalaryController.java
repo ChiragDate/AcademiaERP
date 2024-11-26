@@ -1,12 +1,15 @@
 package com.chirag.festaurant.academiaerp.Controller;
 
+import com.chirag.festaurant.academiaerp.Exception.MissingTokenException;
 import com.chirag.festaurant.academiaerp.Service.SalaryService;
-import com.chirag.festaurant.academiaerp.dto.DisburseRequest;
 import com.chirag.festaurant.academiaerp.dto.EmployeeDTO;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.security.sasl.AuthenticationException;
 import java.util.List;
 
 @RestController
@@ -15,19 +18,33 @@ import java.util.List;
 public class SalaryController {
 
     private final SalaryService salaryService;
-    @PostMapping("/disburse")
-    public ResponseEntity<String> disburseSalaries(@RequestBody DisburseRequest request) {
-
+    @CrossOrigin(
+            origins = "http://localhost:3000",
+            allowCredentials = "true",
+            allowedHeaders = "*",
+            methods = {RequestMethod.POST, RequestMethod.OPTIONS}
+    )
+  @PostMapping("/disburse")
+    public ResponseEntity<String> disburseSalaries(@RequestBody List<EmployeeDTO> request) {
+        System.out.println("Disburse Salaries function called");
         salaryService.disburseSalary(request);
         return ResponseEntity.ok("Salaries disbursed successfully.");
 
     }
 
-    @GetMapping("/employees")
-    public ResponseEntity<List<EmployeeDTO>> getEmployeeDetailsWithLastSalary() {
+    @CrossOrigin(
+            origins = "http://localhost:3000",
+            allowCredentials = "true",
+            allowedHeaders = "*",
+            methods = {RequestMethod.POST, RequestMethod.OPTIONS}
+    )
+        @GetMapping("/employees")
+    public ResponseEntity<List<EmployeeDTO>> getEmployeeDetailsWithLastSalary(@RequestHeader(value = "Authorization") String authHeader) {
+
+
         System.out.println("GET employees details called");
         // Call service to fetch employee details and their last disbursed salary
-        return ResponseEntity.ok(salaryService.getEmployeesWithLastSalary());
+        return ResponseEntity.ok(salaryService.getEmployeesWithLastSalary(authHeader));
     }
 
 
